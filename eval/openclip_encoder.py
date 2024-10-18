@@ -54,6 +54,14 @@ class OpenCLIPNetwork:
         return torch.gather(softmax, 1, best_id[..., None, None].expand(best_id.shape[0], len(self.negatives), 2))[
             :, 0, :
         ]
+    
+    def get_relevancy_pc(self, embeds: torch.Tensor):
+        n_phrases = len(self.positives)
+        n_phrases_rel = [None for _ in range(n_phrases)]
+        for j in range(n_phrases):
+            probs = self.get_relevancy(embeds, j)
+            n_phrases_rel[j] = probs[..., 0] #i 尺度上图像与j phrases的相关性[0~1]
+        return n_phrases_rel # (n_pos, P)
 
     def encode_image(self, input, mask=None):
         processed_input = self.process(input).half()

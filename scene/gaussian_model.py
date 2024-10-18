@@ -253,6 +253,8 @@ class GaussianModel:
             l.append('scale_{}'.format(i))
         for i in range(self._rotation.shape[1]):
             l.append('rot_{}'.format(i))
+        for i in range(self._language_feature.shape[1]):
+            l.append('language_feature_{}'.format(i))
         return l
 
     def save_ply(self, path):
@@ -265,11 +267,12 @@ class GaussianModel:
         opacities = self._opacity.detach().cpu().numpy()
         scale = self._scaling.detach().cpu().numpy()
         rotation = self._rotation.detach().cpu().numpy()
+        language_feature = self._language_feature.cpu().numpy()
 
         dtype_full = [(attribute, 'f4') for attribute in self.construct_list_of_attributes()]
 
         elements = np.empty(xyz.shape[0], dtype=dtype_full)
-        attributes = np.concatenate((xyz, normals, f_dc, f_rest, opacities, scale, rotation), axis=1)
+        attributes = np.concatenate((xyz, normals, f_dc, f_rest, opacities, scale, rotation, language_feature), axis=1)
         elements[:] = list(map(tuple, attributes))
         el = PlyElement.describe(elements, 'vertex')
         PlyData([el]).write(path)
@@ -313,6 +316,12 @@ class GaussianModel:
         for idx, attr_name in enumerate(rot_names):
             rots[:, idx] = np.asarray(plydata.elements[0][attr_name])
 
+        language_feature_names = [p.name for p in plydata.elements[0].properties if p.name.startswith("language_feature")]
+        language_feature_names = sorted(rot_names, key = lambda x: int(x.split('_')[-1]))
+        langguage_features = np.zeros((xyz.shape[0], len(language_feature_names)))
+        for idx, attr_name in enumerate(language_feature_names):
+            langguage_features[:, idx] = np.asarray(plydata.elements[0][attr_name])
+
         self._xyz = nn.Parameter(torch.tensor(xyz, dtype=torch.float, device="cuda").requires_grad_(True))
         print(self._xyz.shape[0])
         self._features_dc = nn.Parameter(torch.tensor(features_dc, dtype=torch.float, device="cuda").transpose(1, 2).contiguous().requires_grad_(True))
@@ -320,6 +329,7 @@ class GaussianModel:
         self._opacity = nn.Parameter(torch.tensor(opacities, dtype=torch.float, device="cuda").requires_grad_(True))
         self._scaling = nn.Parameter(torch.tensor(scales, dtype=torch.float, device="cuda").requires_grad_(True))
         self._rotation = nn.Parameter(torch.tensor(rots, dtype=torch.float, device="cuda").requires_grad_(True))
+        self._language_feature = nn.Parameter(torch.tensor(langguage_features, dtype=torch.float, device="cuda").requires_grad_(True))
 
         self.active_sh_degree = self.max_sh_degree
 
@@ -372,6 +382,17 @@ class GaussianModel:
 
         self.denom = self.denom[valid_points_mask]
         self.max_radii2D = self.max_radii2D[valid_points_mask]
+
+    def remove_points(self, mask):
+        valid_points_mask = ~mask
+        self._xyz = self._xyz[valid_points_mask]
+        self._features_dc = self._features_dc[valid_points_mask]
+        self._features_rest = self._features_rest[valid_points_mask]
+        self._opacity = self._opacity[valid_points_mask]
+        # self._language_feature = optimizable_tensors["language_feature"]
+        self._scaling = self._scaling[valid_points_mask]
+        self._rotation = self._rotation[valid_points_mask]
+        self._language_feature = self._language_feature[valid_points_mask]
 
     def cat_tensors_to_optimizer(self, tensors_dict):
         optimizable_tensors = {}

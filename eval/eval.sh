@@ -1,15 +1,15 @@
 #!/bin/bash
-CASE_NAME="teatime"
+CASE_NAME="pretrain_teatime"
 
 # path to lerf_ovs/label
 gt_folder="../data/lerf_ovs/label"
 
-root_path="../"
+root_path=".."
 
 python evaluate_iou_loc.py \
         --dataset_name ${CASE_NAME} \
-        --feat_dir ${root_path}/output \
-        --ae_ckpt_dir ${root_path}/autoencoder/ckpt \
+        --feat_dir ${root_path}/output/lerf_ovs \
+        --ae_ckpt_dir ${root_path}/ckpt \
         --output_dir ${root_path}/eval_result \
         --mask_thresh 0.4 \
         --encoder_dims 256 128 64 32 3 \
