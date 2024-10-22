@@ -6,7 +6,7 @@ gt_folder="../data/lerf_ovs/label"
 
 root_path=".."
 
-python evaluate_iou_loc.py \
+python -m pdb evaluate_iou_loc.py \
         --dataset_name ${CASE_NAME} \
         --feat_dir ${root_path}/output/lerf_ovs \
         --ae_ckpt_dir ${root_path}/ckpt/lerf_ovs \
