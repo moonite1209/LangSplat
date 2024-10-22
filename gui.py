@@ -57,8 +57,8 @@ class CONFIG:
 
     white_background = False
 
-    dataset_name = 'lerf_ovs/teatime'
-    feature_level = 2
+    dataset_name = 'lerf_ovs/figurines'
+    feature_level = 3
     FEATURE_DIM = 32
     MODEL_PATH = f'output/{dataset_name}_{feature_level}' # f'./output/ablation/temp/{dataset_name}_3d_3' # 30000
     ae_ckpt_path = f'ckpt/{dataset_name}/best_ckpt.pth' # f'./ckpt/{dataset_name}/best_ckpt.pth'
