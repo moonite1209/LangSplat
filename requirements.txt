@@ -1,0 +1,19 @@
+torch==2.4.1+cu118
+torchvision==0.19.1+cu118
+torchaudio==2.4.1+cu118
+open-clip-torch
+plyfile
+tqdm
+opencv-python
+tensorboard
+matplotlib
+transformers
+scikit-learn
+jaxtyping
+typing
+pathlib
+dearpygui
+submodules/langsplat-rasterization
+submodules/segment-anything-langsplat
+submodules/simple-knn
+--extra-index-url https://download.pytorch.org/whl/cu118

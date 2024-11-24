@@ -57,7 +57,7 @@ class CONFIG:
 
     white_background = False
 
-    dataset_name = 'lerf_ovs/figurines'
+    dataset_name = 'replic/office3'
     feature_level = 3
     FEATURE_DIM = 32
     MODEL_PATH = f'output/{dataset_name}_{feature_level}' # f'./output/ablation/temp/{dataset_name}_3d_3' # 30000
